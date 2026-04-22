@@ -189,7 +189,7 @@ export default function App() {
 
         <div className="entry">
           <div className="entry-row">
-            <span className="entry-title">CU Buffs Advising Portal - Website Redesign</span>
+            <span className="entry-title">CU Buffs Advising Portal - Web Redesign</span>
             <span className="entry-date">Mar 2026 - Apr 2026</span>
           </div>
           <a
@@ -200,7 +200,7 @@ export default function App() {
             cubuffsadvising.netlify.app
           </a>
           <p className="entry-blurb">
-            Redesigned my university's advising portal front end using React. 
+            Redesigned my university's advising portal's front end using React. 
             Presented to a senior UX designer on the CU Boulder Portal team and received valuable and positive feedback.
           </p>
         </div>
