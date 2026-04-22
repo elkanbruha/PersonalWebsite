@@ -189,19 +189,19 @@ export default function App() {
 
         <div className="entry">
           <div className="entry-row">
-            <span className="entry-title">Virgile Guillaumin - Portfolio Website</span>
-            <span className="entry-date">Jan 2024</span>
+            <span className="entry-title">CU Buffs Advising Portal - Website Redesign</span>
+            <span className="entry-date">Mar 2026 - Apr 2026</span>
           </div>
           <a
-            href="https://virgileguillaumin.com"
+            href="https://cubuffsadvising.netlify.app"
             target="_blank"
             rel="noreferrer"
           >
-            virgileguillaumin.com
+            cubuffsadvising.netlify.app
           </a>
           <p className="entry-blurb">
-            My first basic static HTML & CSS website, designed as an artistic
-            portfolio for a French actor.
+            Redesigned my university's advising portal front end using React. 
+            Presented to a senior UX designer on the CU Boulder Portal team and received valuable and positive feedback.
           </p>
         </div>
       </section>
