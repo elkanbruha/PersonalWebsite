@@ -113,8 +113,9 @@ export default function App() {
       <section className="section">
         <h2 className="section-heading">About</h2>
         <p className="prose">
-          Founder and lead engineer of CrowdCount, a B2B computer vision startup
-          building real-time occupancy analytics for brick-and-mortar businesses.
+          Founder and lead engineer of CrowdCount, a B2B computer vision platform
+          powering real-time occupancy analytics for brick-and-mortar businesses 
+          and a consumer live-occupancy map that turns partner venues into discoverable destinations.
           Studying computer science at CU Boulder. Dual US/French citizen, based
           between New York and Boulder.
         </p>
@@ -126,22 +127,22 @@ export default function App() {
         <div className="entry">
           <div className="entry-row">
             <span className="entry-title">CrowdCount — Founder & Lead Engineer</span>
-            <span className="entry-date">May 2024 – present</span>
+            <span className="entry-date">May 2024 - present</span>
           </div>
           <a href="https://crowdcount.tech" target="_blank">crowdcount.tech</a>
           <p className="entry-blurb">
             Built the original full stack for a computer vision occupancy startup; iOS app,
             three Next.js sites, Python/Flask backend, a CUDA-accelerated RTSP
-            server ingesting 200+ streams, and custom edge hardware.
-            Live in 25+ locations with expansion planned for August; raising a pre-seed at a
-            $1M valuation while managing a team of 7.
+            server (built in-house) capable of ingesting 200+ streams, and custom edge hardware.
+            Live in 25+ locations with a large consumer targeted launch planned for August; 
+            raising a pre-seed at a $1M valuation while managing a team of 7.
           </p>
         </div>
 
         <div className="entry">
           <div className="entry-row">
             <span className="entry-title">RWS Group — Software QA Engineer</span>
-            <span className="entry-date">Mar 2025 – Dec 2025</span>
+            <span className="entry-date">Mar 2025 - Dec 2025</span>
           </div>
           <p className="entry-blurb">
             Freelance general and fr-FR localization QA on pre-release software,
@@ -152,7 +153,7 @@ export default function App() {
         <div className="entry">
           <div className="entry-row">
             <span className="entry-title">Outlier — AI Coding Trainer</span>
-            <span className="entry-date">Nov 2024 – Oct 2025</span>
+            <span className="entry-date">Nov 2024 - Oct 2025</span>
           </div>
           <p className="entry-blurb">
             Wrote CS problem sets and evaluation frameworks used to train and grade
@@ -224,7 +225,7 @@ export default function App() {
             <span className="entry-title">
               University of Colorado Boulder — BS Computer Science
             </span>
-            <span className="entry-date">Fall 2024 – present</span>
+            <span className="entry-date">Fall 2024 - present</span>
           </div>
           <p className="entry-blurb">
             GPA 3.8 · Dean's List · entered via transfer.
@@ -256,6 +257,20 @@ export default function App() {
             GPA 3.2 · exited via transfer.
             <br></br>
             First cohort of the CentraleSupélec / McGill dual-degree program
+          </p>
+        </div>
+
+        <div className="entry">
+          <div className="entry-row">
+            <span className="entry-title">
+              Lycée Français de New York — High School
+            </span>
+            <span className="entry-date">Fall 2013 - Spring 2023</span>
+          </div>
+          <p className="entry-blurb">
+            GPA 4.0 equivalent · French Baccalaureate (Mention Très Bien)
+            <br></br>
+            Majored in Mathematics, Physics, Chemistry and Computer Science at a bilingual international school.
           </p>
         </div>
       </section>
