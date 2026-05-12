@@ -113,14 +113,10 @@ export default function App() {
       <section className="section">
         <h2 className="section-heading">About</h2>
         <p className="prose">
-          Founder and lead engineer of CrowdCount, a computer vision platform powering
-          real-time occupancy analytics for brick-and-mortar businesses and a consumer
-          live-occupancy map that turns partner venues into discoverable destinations.
-          Most recently founded Upstream, a real-time computer vision infrastructure
-          platform that enables businesses and developers to turn live camera feeds into
-          production-ready events, analytics, and automations without building the
-          underlying video infrastructure themselves. Studying computer science at CU
-          Boulder. Dual US/French citizen based between New York and Boulder.
+          Founded two computer vision startups, CrowdCount and Upstream, focused on
+          real-time occupancy analytics and infrastructure for live camera intelligence
+          systems. Studying computer science at CU Boulder. Dual US/French citizen based
+          between New York and Boulder.
         </p>
       </section>
 
@@ -134,12 +130,11 @@ export default function App() {
           </div>
           <a href="https://upstreamcv.com" target="_blank">upstreamcv.com</a>
           <p className="entry-blurb">
-            Building real-time computer vision infrastructure for startups and businesses
-            that want to deploy camera intelligence systems without spending months
-            building stream ingestion, GPU inference pipelines, orchestration, monitoring,
-            and event delivery. Upstream lets users connect cameras or edge devices,
-            visually configure zones, lines, detections, tracking, and triggers, then turn
-            live video into API calls, alerts, analytics, and automations.
+            Building real-time computer vision infrastructure that lets startups and
+            businesses deploy camera intelligence systems without building the underlying
+            streaming, inference, and orchestration infrastructure themselves. Users can
+            connect cameras, configure detections and triggers, and turn live video into
+            API calls, alerts, analytics, and automations.
           </p>
         </div>
 
