@@ -129,7 +129,7 @@ export default function App() {
 
         <div className="entry">
           <div className="entry-row">
-            <span className="entry-title">Upstream - Co-Founder & Full-stack Developer</span>
+            <span className="entry-title">Upstream - Co-Founder & Full-Stack Developer</span>
             <span className="entry-date">May 2026 - present</span>
           </div>
           <a href="https://upstreamcv.com" target="_blank">upstreamcv.com</a>
