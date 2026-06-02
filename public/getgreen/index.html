@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GetGreen — Your screen time's carbon footprint</title>
+    <meta
+      name="description"
+      content="GetGreen is an iOS app that turns your daily screen time into a rough carbon footprint estimate, plus real-world equivalents. 100% on-device. No accounts, no tracking."
+    />
+    <meta name="theme-color" content="#0b0d0a" />
+    <link rel="canonical" href="https://elkanbruha.com/getgreen" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://elkanbruha.com/getgreen" />
+    <meta property="og:title" content="GetGreen — Your screen time's carbon footprint" />
+    <meta
+      property="og:description"
+      content="iOS app that turns your screen time into a rough carbon footprint estimate, plus real-world equivalents. 100% on-device."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GetGreen — Your screen time's carbon footprint" />
+    <meta
+      name="twitter:description"
+      content="iOS app that turns your screen time into a rough carbon footprint estimate. 100% on-device."
+    />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png" />
+    <style>
+      :root {
+        --bg: #0b0d0a;
+        --surface: #141712;
+        --surface-soft: #181c15;
+        --ink: #f1f3ee;
+        --ink-soft: #9aa394;
+        --ink-dim: #6a7264;
+        --accent: #a1e26b;
+        --accent-soft: rgba(161, 226, 107, 0.14);
+        --rule: #23271f;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro',
+          'Helvetica Neue', Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .page {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 4rem 1.5rem 6rem;
+      }
+
+      .header {
+        margin-bottom: 2.5rem;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+        margin: 0 0 1.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: var(--ink-soft);
+      }
+
+      .brand-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 12px rgba(161, 226, 107, 0.55);
+      }
+
+      h1 {
+        margin: 0 0 0.75rem;
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        color: var(--ink);
+      }
+
+      h1 .accent {
+        color: var(--accent);
+      }
+
+      .subtitle {
+        margin: 0;
+        font-size: 1.05rem;
+        color: var(--ink-soft);
+        line-height: 1.55;
+      }
+
+      .meta {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin: 1.5rem 0 0;
+        font-size: 0.78rem;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.7rem;
+        background: var(--accent-soft);
+        color: var(--accent);
+        border-radius: 999px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+      }
+
+      .chip.neutral {
+        background: var(--surface);
+        color: var(--ink-soft);
+      }
+
+      h2 {
+        margin: 2.5rem 0 0.9rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--ink-soft);
+      }
+
+      p {
+        margin: 0 0 1rem;
+        color: var(--ink);
+      }
+
+      p.muted {
+        color: var(--ink-soft);
+      }
+
+      ul.features {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      ul.features li {
+        padding: 0.7rem 0;
+        border-bottom: 1px solid var(--rule);
+        display: flex;
+        align-items: baseline;
+        gap: 0.85rem;
+        font-size: 0.97rem;
+      }
+
+      ul.features li:last-child {
+        border-bottom: none;
+      }
+
+      ul.features .tick {
+        flex: 0 0 auto;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--accent-soft);
+        color: var(--accent);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 700;
+        transform: translateY(2px);
+      }
+
+      .screenshot-wrap {
+        margin: 2rem 0 0;
+        padding: 1.5rem;
+        background: var(--surface);
+        border: 1px solid var(--rule);
+        border-radius: 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .screenshot {
+        max-width: 280px;
+        width: 100%;
+        height: auto;
+        border-radius: 28px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55),
+          0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+        display: block;
+      }
+
+      .screenshot-placeholder {
+        max-width: 280px;
+        width: 100%;
+        aspect-ratio: 9 / 19.5;
+        border-radius: 28px;
+        background: linear-gradient(
+          180deg,
+          var(--surface-soft) 0%,
+          var(--surface) 100%
+        );
+        border: 1px dashed var(--rule);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 1.5rem;
+        color: var(--ink-dim);
+        font-size: 0.85rem;
+      }
+
+      .screenshot-placeholder strong {
+        color: var(--ink-soft);
+        font-weight: 600;
+      }
+
+      .screenshot-placeholder code {
+        margin-top: 0.4rem;
+        padding: 0.2rem 0.45rem;
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 6px;
+        font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace;
+        font-size: 0.78rem;
+        color: var(--accent);
+      }
+
+      .ctas {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin: 2rem 0 0;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.7rem 1.1rem;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.005em;
+        transition: transform 120ms ease, background 120ms ease;
+      }
+
+      .btn:hover {
+        text-decoration: none;
+        transform: translateY(-1px);
+      }
+
+      .btn.primary {
+        background: var(--accent);
+        color: #0b0d0a;
+      }
+
+      .btn.primary:hover {
+        background: #b6ec85;
+      }
+
+      .btn.ghost {
+        background: var(--surface);
+        color: var(--ink);
+        border: 1px solid var(--rule);
+      }
+
+      .btn.ghost:hover {
+        background: var(--surface-soft);
+      }
+
+      footer {
+        margin-top: 3.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--rule);
+        font-size: 0.85rem;
+        color: var(--ink-dim);
+      }
+
+      footer a {
+        color: var(--ink-soft);
+      }
+
+      @media (max-width: 480px) {
+        .page {
+          padding: 2.5rem 1.25rem 4rem;
+        }
+        h1 {
+          font-size: 1.7rem;
+        }
+        .subtitle {
+          font-size: 1rem;
+        }
+        .screenshot-wrap {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="header">
+        <p class="brand">
+          <span class="brand-dot" aria-hidden="true"></span>
+          GetGreen
+        </p>
+        <h1>
+          Your screen time, <span class="accent">in carbon.</span>
+        </h1>
+        <p class="subtitle">
+          An iOS app that turns your daily phone usage into a rough CO₂
+          estimate — and what that means in trees, miles driven, and Arctic
+          ice. Private by design. Nothing leaves your device.
+        </p>
+        <div class="meta">
+          <span class="chip">iOS 17+</span>
+          <span class="chip neutral">100% on-device</span>
+          <span class="chip neutral">Free</span>
+        </div>
+      </header>
+
+      <div class="screenshot-wrap">
+        <picture>
+          <source srcset="/getgreen/screenshot.png" type="image/png" />
+          <img
+            class="screenshot"
+            src="/getgreen/screenshot.png"
+            alt="GetGreen app screenshot showing today's carbon footprint with equivalents in tree-days, miles driven, Arctic ice, and LED bulb hours."
+            onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'screenshot-placeholder',innerHTML:'<strong>Screenshot goes here</strong><br/>Drop <code>screenshot.png</code> into<br/><code>public/getgreen/</code>'}))"
+          />
+        </picture>
+      </div>
+
+      <h2>What it does</h2>
+      <p class="muted">
+        GetGreen reads your Screen Time totals via Apple's private Family
+        Controls framework and converts them to grams of CO₂ using a blended
+        estimate (~20 g per hour of active screen time, covering device draw,
+        network, and data-center work). It's a rough number — directional, not
+        scientific — but it makes a usually-invisible cost visible.
+      </p>
+
+      <h2>What you see</h2>
+      <ul class="features">
+        <li>
+          <span class="tick" aria-hidden="true">✓</span>
+          <span>
+            <strong>Today's CO₂</strong> — front and center, with a 30-day
+            rolling total beneath it
+          </span>
+        </li>
+        <li>
+          <span class="tick" aria-hidden="true">✓</span>
+          <span>
+            <strong>Tree-days</strong> needed to offset your usage
+          </span>
+        </li>
+        <li>
+          <span class="tick" aria-hidden="true">✓</span>
+          <span>
+            <strong>Equivalent driving distance</strong>, in miles or
+            kilometers
+          </span>
+        </li>
+        <li>
+          <span class="tick" aria-hidden="true">✓</span>
+          <span>
+            <strong>Arctic sea ice lost</strong> — based on Notz &amp; Stroeve
+            (2016), <em>Science</em>
+          </span>
+        </li>
+        <li>
+          <span class="tick" aria-hidden="true">✓</span>
+          <span>
+            <strong>LED bulb hours</strong> equivalent to the same emissions
+          </span>
+        </li>
+      </ul>
+
+      <h2>Privacy</h2>
+      <p class="muted">
+        No accounts. No analytics. No third-party SDKs. No servers. The app
+        makes no network requests of any kind. Your screen-time data stays on
+        your phone — full stop.
+        <a href="/getgreen-privacy-policy">Read the privacy policy →</a>
+      </p>
+
+      <div class="ctas">
+        <a class="btn ghost" href="/getgreen-privacy-policy">Privacy policy</a>
+        <a class="btn ghost" href="mailto:elkanbruha@gmail.com">Contact</a>
+      </div>
+
+      <footer>
+        <p>
+          GetGreen is an independent app by Elkan Bruha.
+          <br />
+          <a href="/">Back to elkanbruha.com</a>
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>

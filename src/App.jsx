@@ -196,9 +196,15 @@ export default function App() {
             <span className="entry-title">GetGreen - iOS App</span>
             <span className="entry-date">Apr 2026</span>
           </div>
+          <a
+            href="https://elkanbruha.com/getgreen"
+            target="_blank"
+            rel="noreferrer"
+          >
+            elkanbruha.com/getgreen</a>
           <p className="entry-blurb">
-            iOS app that converts your screen time into an estimated carbon
-            footprint. Currently awaiting App Store approval.
+            Simple and free iOS app that converts your screen time into an estimated carbon
+            footprint.
           </p>
         </div>
 
