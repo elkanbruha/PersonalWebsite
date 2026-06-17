@@ -4,16 +4,52 @@ export default function App() {
   const wrap1Ref = useRef(null)
   const wrap2Ref = useRef(null)
   const wrap3Ref = useRef(null)
-  const cursorRef = useRef(null)
+  // const cursorRef = useRef(null) // cursor orb disabled
 
   useEffect(() => {
     const wraps = [wrap1Ref.current, wrap2Ref.current, wrap3Ref.current]
-    const cursor = cursorRef.current
+    // const cursor = cursorRef.current // cursor orb disabled
 
-    let targetX = window.innerWidth / 2
-    let targetY = window.innerHeight / 2
-    let currentX = targetX
-    let currentY = targetY
+    // Honor prefers-reduced-motion: rest the orbs at their CSS anchors and
+    // skip the rAF loop + scroll/resize listeners (mirrors Upstream's Atmosphere).
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      return
+    }
+
+    const timers = []
+
+    // Path-free RANDOM drift: each orb starts in the line, then eases to a
+    // fresh random target (offset + scale) on a repeating timer — no fixed
+    // path, every destination is random, all at a steady, normal speed.
+    const blobs = wraps
+      .map((w) => w && w.querySelector('.blob'))
+      .filter(Boolean)
+    const rand = (lo, hi) => lo + Math.random() * (hi - lo)
+
+    const driftTo = (el, durMs) => {
+      const dx = rand(-35, 35)
+      const dy = rand(-35, 35)
+      const s = rand(0.75, 1.25)
+      el.style.transition = `transform ${Math.round(durMs)}ms cubic-bezier(0.37, 0, 0.32, 1)`
+      el.style.transform =
+        `translate(-50%, -50%) translate(${dx.toFixed(1)}%, ${dy.toFixed(1)}%) scale(${s.toFixed(3)})`
+    }
+
+    blobs.forEach((el, i) => {
+      const step = () => {
+        const dur = rand(5000, 8500)
+        driftTo(el, dur)
+        timers.push(setTimeout(step, dur))
+      }
+      // tiny stagger so the three don't fire in lockstep
+      timers.push(setTimeout(step, i * 100))
+    })
+
+    // Cursor orb disabled:
+    // let targetX = window.innerWidth / 2
+    // let targetY = window.innerHeight / 2
+    // let currentX = targetX
+    // let currentY = targetY
 
     const params = [
       { spring: 0.025, damping: 0.94, parallax: 0.10 },
@@ -37,10 +73,11 @@ export default function App() {
       })
     }
 
-    const onMove = (e) => {
-      targetX = e.clientX
-      targetY = e.clientY
-    }
+    // Cursor orb disabled:
+    // const onMove = (e) => {
+    //   targetX = e.clientX
+    //   targetY = e.clientY
+    // }
 
     const onScroll = () => updateBlobTargets()
 
@@ -56,11 +93,12 @@ export default function App() {
 
     let rafId
     const tick = () => {
-      currentX += (targetX - currentX) * 0.15
-      currentY += (targetY - currentY) * 0.15
-      if (cursor) {
-        cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`
-      }
+      // Cursor orb disabled:
+      // currentX += (targetX - currentX) * 0.07
+      // currentY += (targetY - currentY) * 0.07
+      // if (cursor) {
+      //   cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`
+      // }
 
       states.forEach((s, i) => {
         const wrap = wraps[i]
@@ -77,16 +115,17 @@ export default function App() {
       rafId = requestAnimationFrame(tick)
     }
 
-    window.addEventListener('mousemove', onMove)
+    // window.addEventListener('mousemove', onMove) // cursor orb disabled
     window.addEventListener('scroll', onScroll, { passive: true })
     window.addEventListener('resize', onResize)
     rafId = requestAnimationFrame(tick)
 
     return () => {
-      window.removeEventListener('mousemove', onMove)
+      // window.removeEventListener('mousemove', onMove) // cursor orb disabled
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onResize)
       cancelAnimationFrame(rafId)
+      timers.forEach((t) => clearTimeout(t))
     }
   }, [])
 
@@ -102,7 +141,7 @@ export default function App() {
         <div ref={wrap3Ref} className="blob-wrap">
           <div className="blob blob-3" />
         </div>
-        <div ref={cursorRef} className="blob cursor-blob" />
+        {/* <div ref={cursorRef} className="blob cursor-blob" /> cursor orb disabled */}
       </div>
       <main className="page">
       <header className="header">
@@ -113,9 +152,7 @@ export default function App() {
       <section className="section">
         <h2 className="section-heading">About</h2>
         <p className="prose">
-          Founded two computer vision startups, CrowdCount and Upstream, focused on
-          real-time occupancy analytics and infrastructure for live camera intelligence
-          systems. Studying computer science at CU Boulder. Dual US/French citizen based
+          Founder and software engineer passionate about product design and computer vision. Studying computer science at CU Boulder. Dual US/French citizen based
           between New York and Boulder.
         </p>
       </section>
@@ -125,7 +162,7 @@ export default function App() {
 
         <div className="entry">
           <div className="entry-row">
-            <span className="entry-title">Upstream - Co-Founder & Full-Stack Developer</span>
+            <span className="entry-title">Upstream - Co-Founder & Software Engineer</span>
             <span className="entry-date">May 2026 - present</span>
           </div>
           <a href="https://upstreamcv.com" target="_blank">upstreamcv.com</a>
@@ -141,7 +178,7 @@ export default function App() {
         <div className="entry">
           <div className="entry-row">
             <span className="entry-title">CrowdCount — Founder & Lead Engineer</span>
-            <span className="entry-date">May 2024 - present</span>
+            <span className="entry-date">May 2024 - May 2026</span>
           </div>
           <a href="https://crowdcount.tech" target="_blank">crowdcount.tech</a>
           <p className="entry-blurb">
@@ -204,7 +241,7 @@ export default function App() {
             elkanbruha.com/getgreen</a>
           <p className="entry-blurb">
             Simple and free iOS app that converts your screen time into an estimated carbon
-            footprint.
+            footprint. (Awaiting App Store approval)
           </p>
         </div>
 
@@ -230,7 +267,7 @@ export default function App() {
       <section className="section">
         <h2 className="section-heading">Skills</h2>
         <p className="prose">
-          JavaScript/TypeScript, Python, C/C++, Swift, SQL. React, Next.js, Node.js, Tailwind, Flask/FastAPI, REST.
+          Python, JavaScript/TypeScript, C/C++, Swift, SQL. React, Next.js, Node.js, Tailwind, Flask/FastAPI, REST.
           iOS (SwiftUI, CoreBluetooth).
           Computer vision and ML (OpenCV, YOLO, PyTorch, ONNX/TensorRT, CUDA).
           AWS (EC2, S3, Lambda), Docker, Linux, Nginx.
@@ -288,7 +325,7 @@ export default function App() {
             <span className="entry-date">Fall 2013 - Spring 2023</span>
           </div>
           <p className="entry-blurb">
-            GPA 4.0 equivalent · French Baccalaureate (Mention Très Bien)
+            GPA 4.0 · French Baccalaureate (Mention Très Bien)
             <br></br>
             Majored in Mathematics, Physics, Chemistry and Computer Science at a bilingual international school.
           </p>

@@ -1,7 +1,40 @@
+/* ───── Satoshi (variable) — vendored from the Upstream marketing site ───── */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/fonts/Satoshi-VariableItalic.woff2') format('woff2');
+  font-weight: 300 900;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
-  --bg: #ebe7d1;
-  --ink: #1c2e1f;
-  --ink-soft: #5c6e4e;
+  /* base ramp — charcoal, ported from Upstream's --base-2 (#161616) */
+  --base: #161616;
+  --base-deep: #0f0f0f;
+
+  /* ink — white, with translucent steps for hierarchy */
+  --ink: #ffffff;
+  --ink-soft: rgba(255, 255, 255, 0.72);
+  --ink-mute: rgba(255, 255, 255, 0.55);
+  --ink-faint: rgba(255, 255, 255, 0.18);
+
+  /* atmosphere orb colors — red / blue / white */
+  --orb-red: #ff3b3b;
+  --orb-blue: #3b6bff;
+  --orb-white: #ffffff;
+  --accent: #5fb869;
+
+  /* atmosphere knobs — drifting orbs + film grain (Upstream recipe) */
+  --orb-opacity: 0.28;
+  --orb-blur: blur(clamp(60px, 8vw, 130px));
+  --grain-opacity: 0.2;
 }
 
 *,
@@ -10,27 +43,56 @@
   box-sizing: border-box;
 }
 
+html {
+  background: var(--base);
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+}
+
 html,
 body {
   margin: 0;
   padding: 0;
-  background: var(--bg);
+}
+
+body {
+  background: var(--base);
   color: var(--ink);
-  font-family: 'Courier Prime', ui-monospace, 'Courier New', Courier, monospace;
+  font-family: 'Satoshi', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   font-size: 16px;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01', 'kern', 'liga';
   overflow-x: hidden;
+  min-height: 100dvh;
 }
 
-/* ───── Animated frosted blob background ───── */
+/* ───── Atmosphere: drifting orbs over charcoal + film grain ─────
+   Ported from Upstream's Atmosphere layer. The orbs are heavily-blurred
+   red/blue/white discs that drift over the charcoal base (mouse/scroll
+   parallax is driven by App.jsx via the .blob-wrap transforms); a grayscale
+   feTurbulence film grain sits on top as the ::after layer. */
 .bg-blobs {
   position: fixed;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
   z-index: 0;
+  background: var(--base);
+}
+
+/* Grain: the dashboard recipe — fractalNoise baseFrequency 0.85, 2 octaves,
+   desaturated, tiled at 140px, low opacity. Painted above the orbs. */
+.bg-blobs::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  opacity: var(--grain-opacity);
+  pointer-events: none;
 }
 
 .blob-wrap {
@@ -44,85 +106,70 @@ body {
   top: 0;
   left: 0;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.55;
+  filter: var(--orb-blur);
+  opacity: var(--orb-opacity);
   will-change: transform;
-  mix-blend-mode: multiply;
 }
 
+/* The orbs START in a horizontal line — blue (left) · white (center) ·
+   red (right). left/top set the corner; the centering translate(-50%,-50%)
+   puts each ORB CENTER on the anchor regardless of its size, so the line
+   holds at any viewport. Movement is path-free + RANDOM, driven by JS
+   (App.jsx): each orb starts in the line, then eases to fresh random targets
+   via an inline transition at a steady, normal speed. */
 .blob-1 {
-  width: 42vmax;
-  height: 42vmax;
-  background: #4d7a3f;
-  transform: translate(-15%, -20%);
-  animation: drift-1 75s ease-in-out infinite;
+  width: 40vmax;
+  height: 40vmax;
+  background: var(--orb-blue);
+  left: 17%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .blob-2 {
-  width: 38vmax;
-  height: 38vmax;
-  background: #2e4a2b;
-  top: auto;
-  bottom: 0;
-  left: auto;
-  right: 0;
-  transform: translate(15%, 20%);
-  animation: drift-2 95s ease-in-out infinite;
+  width: 40vmax;
+  height: 40vmax;
+  background: var(--orb-red);
+  left: 83%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .blob-3 {
   width: 32vmax;
   height: 32vmax;
-  background: #8a9a52;
-  top: 30%;
-  left: 40%;
-  animation: drift-3 115s ease-in-out infinite;
+  background: var(--orb-white);
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
+/* Cursor glow — DISABLED (cursor orb commented out in App.jsx). Was a soft
+   cream light that followed the pointer; re-enable by restoring the JS + the
+   .cursor-blob element, then uncommenting the rule below.
 .cursor-blob {
-  width: 15vmax;
-  height: 15vmax;
-  background: var(--bg);
-  opacity: 0.9;
-  mix-blend-mode: lighten;
+  width: 40vmax;
+  height: 40vmax;
+  background: radial-gradient(circle, rgba(245, 241, 231, 0.08) 0%, transparent 55%);
+  filter: blur(80px);
+  opacity: 1;
+  mix-blend-mode: screen;
 }
+*/
 
-@keyframes drift-1 {
-  0%, 100% { transform: translate(-15%, -20%) scale(1); }
-  20%      { transform: translate(35%, -5%)  scale(1.25); }
-  40%      { transform: translate(50%, 45%)  scale(0.8); }
-  60%      { transform: translate(-5%, 55%)  scale(1.15); }
-  80%      { transform: translate(-45%, 10%) scale(0.9); }
-}
-
-@keyframes drift-2 {
-  0%, 100% { transform: translate(15%, 20%)   scale(1); }
-  20%      { transform: translate(-35%, 30%)  scale(1.3); }
-  40%      { transform: translate(-50%, -20%) scale(0.75); }
-  60%      { transform: translate(10%, -40%)  scale(1.2); }
-  80%      { transform: translate(45%, -10%)  scale(0.9); }
-}
-
-@keyframes drift-3 {
-  0%, 100% { transform: translate(0%, 0%)     scale(1); }
-  20%      { transform: translate(-55%, 30%)  scale(1.35); }
-  40%      { transform: translate(40%, 45%)   scale(0.7); }
-  60%      { transform: translate(60%, -25%)  scale(1.2); }
-  80%      { transform: translate(-35%, -45%) scale(0.85); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .blob-1, .blob-2, .blob-3 { animation: none; }
-}
+/* No @keyframes — orb motion is JS-driven and random (see App.jsx). Under
+   prefers-reduced-motion the JS bails out, so the orbs just rest at their
+   line anchors with no transition. */
 
 a {
   color: inherit;
   text-decoration: none;
-  border-bottom: 1px dotted currentColor;
+  border-bottom: 1px dotted rgba(255, 255, 255, 0.35);
+  transition: border-color 160ms ease, color 160ms ease;
 }
 
 a:hover {
-  border-bottom-style: solid;
+  border-bottom-color: currentColor;
 }
 
 .page {
@@ -140,28 +187,29 @@ a:hover {
 }
 
 .name {
-  font-size: 1.75rem;
+  font-size: 1.85rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.4em;
+  letter-spacing: 0.14em;
   /* compensate for trailing letter-spacing so the text looks centered */
-  text-indent: 0.4em;
+  text-indent: 0.14em;
   margin: 0 0 0.75rem;
+  color: var(--ink);
 }
 
 .header::after {
   content: '';
   display: block;
-  border-top: 3px double var(--ink);
+  border-top: 1px solid var(--ink-faint);
   width: 80%;
-  margin: 0.75rem auto 1rem;
+  margin: 1rem auto 1.25rem;
 }
 
 .tagline {
   margin: 0;
   font-size: 0.95rem;
   letter-spacing: 0.05em;
-  color: var(--ink-soft);
+  color: var(--ink-mute);
 }
 
 /* ───── Sections ───── */
@@ -174,21 +222,23 @@ a:hover {
   align-items: center;
   gap: 1rem;
   margin: 0 0 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: 0.8rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.25em;
+  color: var(--ink);
 }
 
 .section-heading::before,
 .section-heading::after {
   content: '';
   flex: 1;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--ink-faint);
 }
 
 .prose {
   margin: 0;
+  color: var(--ink-soft);
 }
 
 /* ───── Experience entries ───── */
@@ -212,52 +262,16 @@ a:hover {
   font-weight: 700;
   flex: 1 1 0;
   min-width: 0;
+  color: var(--ink);
 }
 
 .entry-date {
   font-size: 0.9rem;
   white-space: nowrap;
-  color: var(--ink-soft);
+  color: var(--ink-mute);
 }
 
 .entry-blurb {
-  margin: 0.25rem 0 0;
-  color: var(--ink-soft);
-}
-
-/* ───── Projects ───── */
-.project-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.project {
-  margin-bottom: 1.5rem;
-}
-
-.project:last-child {
-  margin-bottom: 0;
-}
-
-.project-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  align-items: baseline;
-}
-
-.project-title {
-  font-weight: 700;
-}
-
-.project-link {
-  font-size: 0.9rem;
-  color: var(--ink-soft);
-}
-
-.project-blurb {
   margin: 0.25rem 0 0;
   color: var(--ink-soft);
 }
@@ -267,4 +281,18 @@ a:hover {
   text-align: center;
   margin: 0;
   letter-spacing: 0.05em;
+}
+
+/* ───── Scrollbar — whisper-thin against the dark ───── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.16); }
+
+::selection {
+  background: #ffffff;
+  color: #000000;
 }
