@@ -172,6 +172,9 @@ export default function App() {
             streaming, inference, and orchestration infrastructure themselves. Users can
             connect cameras, configure detections and triggers, and turn live video into
             API calls, alerts, analytics, and automations.
+            <br>
+            </br>
+            Accepted by NVIDIA's Inception Program
           </p>
         </div>
 
