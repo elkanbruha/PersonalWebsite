@@ -174,22 +174,22 @@ export default function App() {
             API calls, alerts, analytics, and automations.
             <br>
             </br>
-            Accepted by NVIDIA's Inception Program
+            Accepted and backed by NVIDIA's Inception Program
           </p>
         </div>
 
         <div className="entry">
           <div className="entry-row">
             <span className="entry-title">CrowdCount — Founder & Lead Engineer</span>
-            <span className="entry-date">May 2024 - May 2026</span>
+            <span className="entry-date">May 2024 - present</span>
           </div>
           <a href="https://crowdcount.tech" target="_blank">crowdcount.tech</a>
           <p className="entry-blurb">
             Built the original full stack for a computer vision occupancy startup; iOS app,
-            three Next.js sites, Python/Flask backend, a CUDA-accelerated RTSP
+            three Next.js sites, Python/Flask backend, a CUDA-accelerated SRT
             server (built in-house) capable of ingesting 200+ streams, and custom edge hardware.
             Live in 25+ locations with a large consumer targeted launch planned for August; 
-            raising a pre-seed at a $1M valuation while managing a team of 7.
+            received $625k valuation while managing a team of 5.
           </p>
         </div>
 
