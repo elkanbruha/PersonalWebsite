@@ -1,371 +1,251 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import Atmosphere from './components/Atmosphere.jsx'
+import Clock from './components/Clock.jsx'
+import Entry from './components/Entry.jsx'
+import Skills from './components/Skills.jsx'
+import NavRail from './components/NavRail.jsx'
+import CommandPalette from './components/CommandPalette.jsx'
+import DemoWindow from './components/DemoWindow.jsx'
+import {
+  profile,
+  sections,
+  experience,
+  dashboards,
+  projects,
+  skillGroups,
+  skillNotes,
+  education,
+  taggedEntries,
+} from './content.js'
+
+const reducedMotion = () =>
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
+const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
+
+const WindowIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <rect x="1.5" y="3.5" width="13" height="10" rx="1.5" />
+    <path d="M1.5 6.5h13" />
+    <circle cx="3.75" cy="5" r="0.5" fill="currentColor" stroke="none" />
+    <circle cx="5.5" cy="5" r="0.5" fill="currentColor" stroke="none" />
+  </svg>
+)
 
 export default function App() {
-  const wrap1Ref = useRef(null)
-  const wrap2Ref = useRef(null)
-  const wrap3Ref = useRef(null)
-  // const cursorRef = useRef(null) // cursor orb disabled
+  const [activeSkill, setActiveSkill] = useState(null)
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [demo, setDemo] = useState(null)
+  const [copied, setCopied] = useState(false)
 
-  useEffect(() => {
-    const wraps = [wrap1Ref.current, wrap2Ref.current, wrap3Ref.current]
-    // const cursor = cursorRef.current // cursor orb disabled
+  const entryState = (tags) => {
+    if (!activeSkill) return ''
+    return tags.includes(activeSkill) ? 'lit' : 'dim'
+  }
 
-    // Honor prefers-reduced-motion: rest the orbs at their CSS anchors and
-    // skip the rAF loop + scroll/resize listeners (mirrors Upstream's Atmosphere).
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-      return
-    }
+  const jumpTo = useCallback((id) => {
+    const el = document.getElementById(id)
+    if (!el) return
+    el.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' })
+    history.replaceState(null, '', `#${id}`)
+  }, [])
 
-    const timers = []
-
-    // Path-free RANDOM drift: each orb starts in the line, then eases to a
-    // fresh random target (offset + scale) on a repeating timer — no fixed
-    // path, every destination is random, all at a steady, normal speed.
-    const blobs = wraps
-      .map((w) => w && w.querySelector('.blob'))
-      .filter(Boolean)
-    const rand = (lo, hi) => lo + Math.random() * (hi - lo)
-
-    const driftTo = (el, durMs) => {
-      const dx = rand(-35, 35)
-      const dy = rand(-35, 35)
-      const s = rand(0.75, 1.25)
-      el.style.transition = `transform ${Math.round(durMs)}ms cubic-bezier(0.37, 0, 0.32, 1)`
-      el.style.transform =
-        `translate(-50%, -50%) translate(${dx.toFixed(1)}%, ${dy.toFixed(1)}%) scale(${s.toFixed(3)})`
-    }
-
-    blobs.forEach((el, i) => {
-      const step = () => {
-        const dur = rand(5000, 8500)
-        driftTo(el, dur)
-        timers.push(setTimeout(step, dur))
-      }
-      // tiny stagger so the three don't fire in lockstep
-      timers.push(setTimeout(step, i * 100))
-    })
-
-    // Cursor orb disabled:
-    // let targetX = window.innerWidth / 2
-    // let targetY = window.innerHeight / 2
-    // let currentX = targetX
-    // let currentY = targetY
-
-    const params = [
-      { spring: 0.025, damping: 0.94, parallax: 0.10 },
-      { spring: 0.020, damping: 0.95, parallax: 0.06 },
-      { spring: 0.015, damping: 0.96, parallax: 0.03 },
-    ]
-    const states = params.map((p) => ({
-      x: 0,
-      y: 0,
-      vx: 0,
-      vy: 0,
-      tx: 0,
-      ty: 0,
-      ...p,
-    }))
-
-    const updateBlobTargets = () => {
-      const sy = window.scrollY
-      states.forEach((s) => {
-        s.ty = -sy * s.parallax
-      })
-    }
-
-    // Cursor orb disabled:
-    // const onMove = (e) => {
-    //   targetX = e.clientX
-    //   targetY = e.clientY
-    // }
-
-    const onScroll = () => updateBlobTargets()
-
-    const onResize = () => {
-      updateBlobTargets()
-      states.forEach((s) => {
-        s.vx += (Math.random() - 0.5) * 10
-        s.vy += (Math.random() - 0.5) * 10
-      })
-    }
-
-    updateBlobTargets()
-
-    let rafId
-    const tick = () => {
-      // Cursor orb disabled:
-      // currentX += (targetX - currentX) * 0.07
-      // currentY += (targetY - currentY) * 0.07
-      // if (cursor) {
-      //   cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`
-      // }
-
-      states.forEach((s, i) => {
-        const wrap = wraps[i]
-        if (!wrap) return
-        s.vx += (s.tx - s.x) * s.spring
-        s.vy += (s.ty - s.y) * s.spring
-        s.vx *= s.damping
-        s.vy *= s.damping
-        s.x += s.vx
-        s.y += s.vy
-        wrap.style.transform = `translate3d(${s.x.toFixed(2)}px, ${s.y.toFixed(2)}px, 0)`
-      })
-
-      rafId = requestAnimationFrame(tick)
-    }
-
-    // window.addEventListener('mousemove', onMove) // cursor orb disabled
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onResize)
-    rafId = requestAnimationFrame(tick)
-
-    return () => {
-      // window.removeEventListener('mousemove', onMove) // cursor orb disabled
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onResize)
-      cancelAnimationFrame(rafId)
-      timers.forEach((t) => clearTimeout(t))
+  const copyEmail = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(profile.email)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1600)
+    } catch {
+      window.location.href = `mailto:${profile.email}`
     }
   }, [])
 
+  const closeDemo = useCallback(() => setDemo(null), [])
+
+  // ⌘K / Ctrl+K opens the palette; Escape clears a selected skill when
+  // nothing else is open to receive it.
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen((o) => !o)
+      } else if (e.key === 'Escape' && !paletteOpen && !demo) {
+        setActiveSkill(null)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [paletteOpen, demo])
+
+  const openLink = (url) => () => window.open(url, '_blank', 'noopener,noreferrer')
+
+  const actions = useMemo(
+    () => [
+      ...sections.map((s) => ({
+        id: `go-${s.id}`,
+        group: 'Sections',
+        label: s.label,
+        hint: 'jump',
+        run: () => jumpTo(s.id),
+      })),
+      ...dashboards.map((d) => ({
+        id: `demo-${d.id}`,
+        group: 'Demos',
+        label: `Open ${d.title}`,
+        hint: 'window',
+        run: () => setDemo(d),
+      })),
+      { id: 'copy-email', group: 'Contact', label: 'Copy email address', hint: profile.email, run: copyEmail },
+      { id: 'resume', group: 'Contact', label: 'Open resume (PDF)', hint: 'new tab', run: openLink(profile.resume) },
+      { id: 'github', group: 'Contact', label: 'GitHub', hint: 'github.com/elkanbruha', run: openLink(profile.github) },
+      { id: 'linkedin', group: 'Contact', label: 'LinkedIn', hint: 'linkedin.com/in/elkanbruha', run: openLink(profile.linkedin) },
+      ...experience
+        .filter((e) => e.url)
+        .map((e) => ({
+          id: `site-${e.id}`,
+          group: 'Sites',
+          label: e.title.split(' — ')[0],
+          hint: e.url.replace(/^https?:\/\//, ''),
+          run: openLink(e.url),
+        })),
+      ...projects.map((p) => ({
+        id: `site-${p.id}`,
+        group: 'Sites',
+        label: p.title.split(' — ')[0],
+        hint: p.urlLabel,
+        run: openLink(p.url),
+      })),
+    ],
+    [jumpTo, copyEmail],
+  )
+
   return (
     <>
-      <div className="bg-blobs" aria-hidden="true">
-        <div ref={wrap1Ref} className="blob-wrap">
-          <div className="blob blob-1" />
-        </div>
-        <div ref={wrap2Ref} className="blob-wrap">
-          <div className="blob blob-2" />
-        </div>
-        <div ref={wrap3Ref} className="blob-wrap">
-          <div className="blob blob-3" />
-        </div>
-        {/* <div ref={cursorRef} className="blob cursor-blob" /> cursor orb disabled */}
-      </div>
+      <Atmosphere />
+      <NavRail sections={sections} onJump={jumpTo} />
+
       <main className="page">
-      <header className="header">
-        <h1 className="name">Elkan Bruha</h1>
-        <p className="tagline">founder · engineer · cu boulder</p>
-      </header>
+        <header className="header">
+          <h1 className="name">{profile.name}</h1>
+          <p className="tagline">{profile.tagline}</p>
+          <Clock places={profile.places} />
+        </header>
 
-      <section className="section">
-        <h2 className="section-heading">About</h2>
-        <p className="prose">
-          Founder and software engineer passionate about product design and computer vision. Studying computer science at CU Boulder. Dual US/French citizen based
-          between New York and Boulder.
-        </p>
-      </section>
+        <section className="section" id="about">
+          <h2 className="section-heading">About</h2>
+          <p className="prose">{profile.about}</p>
+        </section>
 
-      <section className="section">
-        <h2 className="section-heading">Experience</h2>
+        <section className="section" id="experience">
+          <h2 className="section-heading">Experience</h2>
+          {experience.map((e) => (
+            <Entry key={e.id} {...e} state={entryState(e.tags)} />
+          ))}
+        </section>
 
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">Upstream - Co-Founder & Software Engineer</span>
-            <span className="entry-date">May 2026 - present</span>
-          </div>
-          <a href="https://upstreamcv.com" target="_blank">upstreamcv.com</a>
-          <p className="entry-blurb">
-            Building real-time computer vision infrastructure that lets startups and
-            businesses deploy camera intelligence systems without building the underlying
-            streaming, inference, and orchestration infrastructure themselves. Users can
-            connect cameras, configure detections and triggers, and turn live video into
-            API calls, alerts, analytics, and automations.
-            <br>
-            </br>
-            Accepted and backed by NVIDIA's Inception Program
+        <section className="section" id="dashboards">
+          <h2 className="section-heading">Dashboards</h2>
+          <p className="prose section-intro">
+            The product consoles behind each company. Each one opens in a window right here,
+            as a working demo with sample data, so there is no account to create.
           </p>
-        </div>
+          {dashboards.map((d) => (
+            <Entry
+              key={d.id}
+              id={d.id}
+              title={d.title}
+              date={d.date}
+              blurb={d.blurb}
+              state={entryState(d.tags)}
+            >
+              <p className="dash-stack">{d.stack.join(' · ')}</p>
+              <p className="dash-actions">
+                <button
+                  type="button"
+                  className="open-window"
+                  aria-pressed={demo?.id === d.id}
+                  onClick={() => setDemo(d)}
+                >
+                  <WindowIcon /> {demo?.id === d.id ? 'Open' : 'Open window'}
+                </button>
+              </p>
+            </Entry>
+          ))}
+        </section>
 
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">CrowdCount — Founder & Lead Engineer</span>
-            <span className="entry-date">May 2024 - present</span>
-          </div>
-          <a href="https://crowdcount.tech" target="_blank">crowdcount.tech</a>
-          <p className="entry-blurb">
-            Built the original full stack for a computer vision occupancy startup; iOS app,
-            three Next.js sites, Python/Flask backend, a CUDA-accelerated SRT
-            server (built in-house) capable of ingesting 200+ streams, and custom edge hardware.
-            Live in 25+ locations with a large consumer targeted launch planned for August; 
-            received $625k valuation while managing a team of 5.
+        <section className="section" id="projects">
+          <h2 className="section-heading">Projects</h2>
+          {projects.map((p) => (
+            <Entry key={p.id} {...p} state={entryState(p.tags)} />
+          ))}
+        </section>
+
+        <section className="section" id="skills">
+          <h2 className="section-heading">Skills</h2>
+          <Skills
+            groups={skillGroups}
+            entries={taggedEntries}
+            notes={skillNotes}
+            active={activeSkill}
+            onSelect={setActiveSkill}
+          />
+        </section>
+
+        <section className="section" id="education">
+          <h2 className="section-heading">Education</h2>
+          {education.map((e) => (
+            <article className="entry" key={e.id} id={e.id}>
+              <div className="entry-row">
+                <h3 className="entry-title">{e.title}</h3>
+                <span className="entry-date">{e.date}</span>
+              </div>
+              <p className="entry-blurb">
+                {e.lines.map((line, i) => (
+                  <span key={line}>
+                    {i > 0 && <br />}
+                    {line}
+                  </span>
+                ))}
+              </p>
+            </article>
+          ))}
+        </section>
+
+        <section className="section" id="contact">
+          <h2 className="section-heading">Contact</h2>
+          <p className="contact">
+            <a href={`mailto:${profile.email}`}>email</a>
+            <button type="button" className="copy-btn" onClick={copyEmail} aria-live="polite">
+              {copied ? 'copied' : 'copy'}
+            </button>
+            <span aria-hidden="true"> · </span>
+            <a href={profile.github} target="_blank" rel="noreferrer">
+              github
+            </a>
+            <span aria-hidden="true"> · </span>
+            <a href={profile.linkedin} target="_blank" rel="noreferrer">
+              linkedin
+            </a>
+            <span aria-hidden="true"> · </span>
+            <a href={profile.resume} target="_blank" rel="noreferrer">
+              resume
+            </a>
           </p>
-        </div>
-
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">RWS Group — Software QA Engineer</span>
-            <span className="entry-date">Mar 2025 - Dec 2025</span>
-          </div>
-          <p className="entry-blurb">
-            Freelance general and fr-FR localization QA on pre-release software,
-            primarily Google products.
-          </p>
-        </div>
-
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">Outlier — AI Coding Trainer</span>
-            <span className="entry-date">Nov 2024 - Oct 2025</span>
-          </div>
-          <p className="entry-blurb">
-            Wrote CS problem sets and evaluation frameworks used to train and grade
-            LLM code output — correctness, edge cases, hallucinations, and unsafe
-            patterns.
-          </p>
-        </div>
-
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">Onepoint — Lead Project Developer</span>
-            <span className="entry-date">Fall 2023</span>
-          </div>
-          <p className="entry-blurb">
-            Led a student team building a full-stack stock market panel with an ML
-            profitability model, presented to Onepoint's C-suite.
-          </p>
-        </div>
-      </section>
-
-      <section className="section">
-        <h2 className="section-heading">Projects</h2>
-
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">GetGreen - iOS App</span>
-            <span className="entry-date">Apr 2026</span>
-          </div>
-          <a
-            href="https://elkanbruha.com/getgreen"
-            target="_blank"
-            rel="noreferrer"
-          >
-            elkanbruha.com/getgreen</a>
-          <p className="entry-blurb">
-            Simple and free iOS app that converts your screen time into an estimated carbon
-            footprint. (Awaiting App Store approval)
-          </p>
-        </div>
-
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">CU Buffs Advising Portal - Web Redesign</span>
-            <span className="entry-date">Mar 2026 - Apr 2026</span>
-          </div>
-          <a
-            href="https://cubuffsadvising.netlify.app"
-            target="_blank"
-            rel="noreferrer"
-          >
-            cubuffsadvising.netlify.app
-          </a>
-          <p className="entry-blurb">
-            Redesigned my university's advising portal's front end using React. 
-            Presented to a senior UX designer on the CU Boulder Portal team and received valuable and positive feedback.
-          </p>
-        </div>
-      </section>
-
-      <section className="section">
-        <h2 className="section-heading">Skills</h2>
-        <p className="prose">
-          Python, JavaScript/TypeScript, C/C++, Swift, SQL. React, Next.js, Node.js, Tailwind, Flask/FastAPI, REST.
-          iOS (SwiftUI, CoreBluetooth).
-          Computer vision and ML (OpenCV, YOLO, PyTorch, ONNX/TensorRT, CUDA).
-          AWS (EC2, S3, Lambda), Docker, Linux, Nginx.
-        </p>
-      </section>
-
-      <section className="section">
-        <h2 className="section-heading">Education</h2>
-
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">
-              University of Colorado Boulder — BS Computer Science
-            </span>
-            <span className="entry-date">Fall 2024 - present</span>
-          </div>
-          <p className="entry-blurb">
-            GPA 3.8 · Dean's List · entered via transfer.
-            <br></br>
-            Seeking full-time roles; prepared to adjust course load or take leave to commit fully.
-          </p>
-        </div>
-
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">
-              New York University — Visiting Student
-            </span>
-            <span className="entry-date">Spring 2024</span>
-          </div>
-          <p className="entry-blurb">
-            GPA 3.8 · Computer science coursework.
-          </p>
-        </div>
-
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">
-              Université Paris-Saclay (CentraleSupélec) — Global Engineering
-            </span>
-            <span className="entry-date">Fall 2023</span>
-          </div>
-          <p className="entry-blurb">
-            GPA 3.2 · exited via transfer.
-            <br></br>
-            First cohort of the CentraleSupélec / McGill dual-degree program
-          </p>
-        </div>
-
-        <div className="entry">
-          <div className="entry-row">
-            <span className="entry-title">
-              Lycée Français de New York — High School
-            </span>
-            <span className="entry-date">Fall 2013 - Spring 2023</span>
-          </div>
-          <p className="entry-blurb">
-            GPA 4.0 · French Baccalaureate (Mention Très Bien)
-            <br></br>
-            Majored in Mathematics, Physics, Chemistry and Computer Science at a bilingual international school.
-          </p>
-        </div>
-      </section>
-
-      <section className="section">
-        <h2 className="section-heading">Contact</h2>
-        <p className="contact">
-          <a href="mailto:elkanbruha@gmail.com">email</a>
-          <span aria-hidden="true"> · </span>
-          <a
-            href="https://github.com/elkanbruha"
-            target="_blank"
-            rel="noreferrer"
-          >
-            github
-          </a>
-          <span aria-hidden="true"> · </span>
-          <a
-            href="https://linkedin.com/in/elkanbruha"
-            target="_blank"
-            rel="noreferrer"
-          >
-            linkedin
-          </a>
-          <span aria-hidden="true"> · </span>
-          <a
-            href="/Elkan-Bruha-Resume.pdf"
-            target="_blank"
-            rel="noreferrer"
-          >
-            resume
-          </a>
-        </p>
-      </section>
+        </section>
       </main>
+
+      <button
+        type="button"
+        className="palette-trigger"
+        onClick={() => setPaletteOpen(true)}
+        aria-haspopup="dialog"
+        aria-expanded={paletteOpen}
+      >
+        Jump to <kbd>{isMac ? '⌘K' : 'Ctrl K'}</kbd>
+      </button>
+
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} actions={actions} />
+      {demo && <DemoWindow demo={demo} onClose={closeDemo} />}
     </>
   )
 }
