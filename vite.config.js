@@ -27,4 +27,10 @@ function staticSubpages() {
 
 export default defineConfig({
   plugins: [react(), staticSubpages()],
+  server: {
+    // Safari caches dev modules hard enough that an edit can look like it
+    // never happened, and the demo windows frame separately-built apps whose
+    // hashed assets change under it. Nothing in dev is worth caching.
+    headers: { 'Cache-Control': 'no-store' },
+  },
 })
